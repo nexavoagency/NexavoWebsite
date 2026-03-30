@@ -37,6 +37,24 @@
     .why-icon { font-size: 2.2rem; margin-bottom: 14px; }
     .why-title { font-family: 'Playfair Display',serif; font-weight: 700; font-size: 1rem; color: var(--white); margin-bottom: 8px; }
     .why-desc { font-size: 0.84rem; color: var(--white-muted); line-height: 1.6; font-weight: 300; }
+
+    /* ── Team avatar image support ── */
+    .team-avatar {
+      overflow: hidden;
+      position: relative;
+    }
+    .team-avatar img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      display: block;
+      position: absolute;
+      top: 0; left: 0;
+    }
+    .team-avatar .avatar-letter {
+      position: relative;
+      z-index: 0;
+    }
   </style>
 </head>
 <body>
@@ -171,8 +189,15 @@
     <p class="section-desc reveal">Four dedicated professionals delivering exceptional digital experiences.</p>
   </div>
   <div class="team-grid">
+
+    <!-- Muhammad Hunain -->
     <div class="team-card reveal">
-      <div class="team-avatar" style="background:linear-gradient(135deg,#c9a84c,#e8c87a);">H</div>
+      <div class="team-avatar" style="background:linear-gradient(135deg,#c9a84c,#e8c87a);">
+        <!-- 👇 Replace src with your image path e.g. images/hunain.jpg -->
+        <img src="./assets/hunain image.png" alt="Muhammad Hunain"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='inline';">
+        <span class="avatar-letter" style="display:none;">H</span>
+      </div>
       <h3 class="team-name">Muhammad Hunain</h3>
       <p class="team-role">Lead Developer</p>
       <p style="font-size:0.83rem;color:var(--white-muted);line-height:1.6;margin-bottom:18px;font-weight:300;">ERP Operations & System Architecture specialist leading core development.</p>
@@ -182,8 +207,15 @@
         <a href="#" title="GitHub">⌥</a>
       </div>
     </div>
+
+    <!-- Muhammad Huzaifa -->
     <div class="team-card reveal">
-      <div class="team-avatar" style="background:linear-gradient(135deg,#a07830,#c9a84c);">U</div>
+      <div class="team-avatar" style="background:linear-gradient(135deg,#a07830,#c9a84c);">
+        <!-- 👇 Replace src with your image path e.g. images/huzaifa.jpg -->
+        <img src="./assets/huzaifa.png" alt="Muhammad Huzaifa"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='inline';">
+        <span class="avatar-letter" style="display:none;">U</span>
+      </div>
       <h3 class="team-name">Muhammad Huzaifa</h3>
       <p class="team-role">Frontend Developer</p>
       <p style="font-size:0.83rem;color:var(--white-muted);line-height:1.6;margin-bottom:18px;font-weight:300;">UI Implementation & Canva Design expert crafting stunning interfaces.</p>
@@ -193,8 +225,15 @@
         <a href="#" title="GitHub">⌥</a>
       </div>
     </div>
+
+    <!-- Warzan ul Haq -->
     <div class="team-card reveal">
-      <div class="team-avatar" style="background:linear-gradient(135deg,#e8c87a,#c9a84c);">W</div>
+      <div class="team-avatar" style="background:linear-gradient(135deg,#e8c87a,#c9a84c);">
+        <!-- 👇 Replace src with your image path e.g. images/warzan.jpg -->
+        <img src="./assets/warzan.png" alt="Warzan ul Haq"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='inline';">
+        <span class="avatar-letter" style="display:none;">W</span>
+      </div>
       <h3 class="team-name">Warzan ul Haq</h3>
       <p class="team-role">WordPress Developer</p>
       <p style="font-size:0.83rem;color:var(--white-muted);line-height:1.6;margin-bottom:18px;font-weight:300;">ERP Support & Multi-tasking Operations across diverse client projects.</p>
@@ -204,8 +243,15 @@
         <a href="#" title="GitHub">⌥</a>
       </div>
     </div>
+
+    <!-- Muhammad Ahzam -->
     <div class="team-card reveal">
-      <div class="team-avatar" style="background:linear-gradient(135deg,#c9a84c,#a07830);">A</div>
+      <div class="team-avatar" style="background:linear-gradient(135deg,#c9a84c,#a07830);">
+        <!-- 👇 Replace src with your image path e.g. images/ahzam.jpg -->
+        <img src="./assets/ahzam.png" alt="Muhammad Ahzam"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='inline';">
+        <span class="avatar-letter" style="display:none;">A</span>
+      </div>
       <h3 class="team-name">Muhammad Ahzam</h3>
       <p class="team-role">Backend Developer</p>
       <p style="font-size:0.83rem;color:var(--white-muted);line-height:1.6;margin-bottom:18px;font-weight:300;">Logic Architecture & UI/UX Management powering robust backend systems.</p>
@@ -215,6 +261,7 @@
         <a href="#" title="GitHub">⌥</a>
       </div>
     </div>
+
   </div>
 </section>
 
