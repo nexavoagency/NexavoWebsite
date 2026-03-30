@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Portfolio — Nexavo Software House</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .portfolio-filters { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:50px; }
+    .filter-btn {
+      padding:8px 22px; background:var(--navy-mid); border:1px solid var(--border);
+      border-radius:4px; color:var(--white-muted); font-family:'Space Mono',monospace;
+      font-size:0.72rem; letter-spacing:1px; cursor:pointer; transition:all 0.3s; text-transform:uppercase;
+    }
+    .filter-btn:hover,.filter-btn.active { background:rgba(201,168,76,0.12); border-color:var(--gold); color:var(--gold); box-shadow:var(--glow-gold); }
+    .portfolio-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:24px; }
+    .portfolio-card {
+      background:var(--navy-mid); border:1px solid var(--border);
+      border-radius:14px; overflow:hidden; transition:all 0.4s;
+    }
+    .portfolio-card:hover { border-color:var(--border-mid); transform:translateY(-6px); box-shadow:var(--glow-gold); }
+    .pc-thumb {
+      height: 190px; display:flex; align-items:center; justify-content:center;
+      font-size: 3.8rem; position:relative; overflow:hidden;
+    }
+    .pc-thumb::after { content:''; position:absolute; inset:0; background:var(--gradient-gold); opacity:0; transition:opacity 0.3s; }
+    .portfolio-card:hover .pc-thumb::after { opacity:0.06; }
+    .pc-body { padding:24px; }
+    .pc-type { font-size:0.68rem; color:var(--gold); font-family:'Space Mono',monospace; letter-spacing:2px; text-transform:uppercase; margin-bottom:8px; }
+    .pc-title { font-family:'Playfair Display',serif; font-size:1rem; font-weight:700; color:var(--white); margin-bottom:9px; }
+    .pc-desc { font-size:0.84rem; color:var(--white-muted); line-height:1.6; margin-bottom:14px; font-weight:300; }
+    .pc-tags { display:flex; flex-wrap:wrap; gap:6px; }
+    .pc-tag { padding:3px 10px; background:rgba(201,168,76,0.07); border:1px solid var(--border); border-radius:3px; font-size:0.7rem; color:var(--white-muted); font-family:'Space Mono',monospace; }
+  </style>
+</head>
+<body>
+<canvas id="particles-canvas"></canvas>
+<nav id="navbar">
+  <a href="index.html" class="nav-logo">Nexavo<span>.</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="services.html">Services</a></li>
+    <li><a href="technologies.html">Technologies</a></li>
+    <li><a href="team.html">Team</a></li>
+    <li><a href="portfolio.html" class="active">Portfolio</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="contact.html" class="nav-cta">Contact Us</a></li>
+  </ul>
+  <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+</nav>
+<div class="mobile-menu" id="mobileMenu"><span class="close-menu">✕</span><a href="index.html">Home</a><a href="services.html">Services</a><a href="technologies.html">Technologies</a><a href="team.html">Team</a><a href="portfolio.html">Portfolio</a><a href="about.html">About</a><a href="contact.html">Contact</a></div>
+
+<div class="page-hero">
+  <div class="hero-bg"></div><div class="hero-grid"></div>
+  <div>
+    <div class="breadcrumb"><a href="index.html">Home</a><span>/</span><span>Portfolio</span></div>
+    <h1 class="page-hero-title">Our <span>Work</span></h1>
+    <p style="color:var(--white-muted);max-width:550px;margin:15px auto 0;line-height:1.7;font-weight:300;">Projects we've built with passion, precision, and purpose.</p>
+  </div>
+</div>
+
+<section>
+  <div class="portfolio-filters reveal">
+    <button class="filter-btn active" onclick="filterPortfolio('all',this)">All Projects</button>
+    <button class="filter-btn" onclick="filterPortfolio('web',this)">Web Dev</button>
+    <button class="filter-btn" onclick="filterPortfolio('erp',this)">ERP</button>
+    <button class="filter-btn" onclick="filterPortfolio('design',this)">Design</button>
+    <button class="filter-btn" onclick="filterPortfolio('ecommerce',this)">E-Commerce</button>
+    <button class="filter-btn" onclick="filterPortfolio('app',this)">Apps</button>
+  </div>
+
+  <div class="portfolio-grid" id="portfolio-grid">
+    <div class="portfolio-card reveal" data-cat="web">
+      <div class="pc-thumb" style="background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(26,51,88,0.8));">🌐</div>
+      <div class="pc-body"><div class="pc-type">Web Development</div><h3 class="pc-title">Corporate Website — TechCorp</h3><p class="pc-desc">Full corporate website with CMS, contact forms, SEO optimization, and multi-language support.</p><div class="pc-tags"><span class="pc-tag">HTML</span><span class="pc-tag">CSS</span><span class="pc-tag">JS</span><span class="pc-tag">PHP</span></div></div>
+    </div>
+    <div class="portfolio-card reveal" data-cat="erp">
+      <div class="pc-thumb" style="background:linear-gradient(135deg,rgba(201,168,76,0.12),rgba(10,22,40,0.9));">⚙️</div>
+      <div class="pc-body"><div class="pc-type">ERPNext</div><h3 class="pc-title">ERPNext Full Setup — Manufacturing Co.</h3><p class="pc-desc">Complete ERPNext implementation with custom modules, workflows, and user training for manufacturing business.</p><div class="pc-tags"><span class="pc-tag">ERPNext</span><span class="pc-tag">Frappe</span><span class="pc-tag">Python</span></div></div>
+    </div>
+    <div class="portfolio-card reveal" data-cat="ecommerce">
+      <div class="pc-thumb" style="background:linear-gradient(135deg,rgba(160,120,48,0.15),rgba(26,51,88,0.7));">🛒</div>
+      <div class="pc-body"><div class="pc-type">E-Commerce</div><h3 class="pc-title">Online Store — FashionHub</h3><p class="pc-desc">Full e-commerce platform with payment integration, inventory management, and customer portal.</p><div class="pc-tags"><span class="pc-tag">WooCommerce</span><span class="pc-tag">WordPress</span><span class="pc-tag">Payment API</span></div></div>
+    </div>
+    <div class="portfolio-card reveal" data-cat="design">
+      <div class="pc-thumb" style="background:linear-gradient(135deg,rgba(232,200,122,0.1),rgba(10,22,40,0.9));">🎨</div>
+      <div class="pc-body"><div class="pc-type">Design</div><h3 class="pc-title">Brand Identity — StartupX</h3><p class="pc-desc">Complete brand identity including logo, color palette, typography, business cards, and brand guidelines.</p><div class="pc-tags"><span class="pc-tag">Logo</span><span class="pc-tag">Illustrator</span><span class="pc-tag">Brand Kit</span></div></div>
+    </div>
+    <div class="portfolio-card reveal" data-cat="app">
+      <div class="pc-thumb" style="background:linear-gradient(135deg,rgba(201,168,76,0.1),rgba(26,51,88,0.8));">📱</div>
+      <div class="pc-body"><div class="pc-type">App Development</div><h3 class="pc-title">Inventory Manager App</h3><p class="pc-desc">Cross-platform inventory management app with barcode scanning, reports, and cloud sync.</p><div class="pc-tags"><span class="pc-tag">React</span><span class="pc-tag">Node.js</span><span class="pc-tag">MySQL</span></div></div>
+    </div>
+    <div class="portfolio-card reveal" data-cat="web">
+      <div class="pc-thumb" style="background:linear-gradient(135deg,rgba(160,120,48,0.12),rgba(10,22,40,0.8));">💼</div>
+      <div class="pc-body"><div class="pc-type">Web Development</div><h3 class="pc-title">Portfolio Website — Agency</h3><p class="pc-desc">Animated portfolio website with custom animations, project showcase, and client testimonials.</p><div class="pc-tags"><span class="pc-tag">HTML</span><span class="pc-tag">GSAP</span><span class="pc-tag">JS</span></div></div>
+    </div>
+    <div class="portfolio-card reveal" data-cat="erp">
+      <div class="pc-thumb" style="background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(17,34,64,0.9));">📊</div>
+      <div class="pc-body"><div class="pc-type">ERPNext</div><h3 class="pc-title">Custom ERP Fields — Retail Chain</h3><p class="pc-desc">Custom DocTypes, fields, and automated reports for a 5-branch retail chain on ERPNext.</p><div class="pc-tags"><span class="pc-tag">ERPNext</span><span class="pc-tag">Custom Fields</span><span class="pc-tag">Reports</span></div></div>
+    </div>
+    <div class="portfolio-card reveal" data-cat="design">
+      <div class="pc-thumb" style="background:linear-gradient(135deg,rgba(232,200,122,0.12),rgba(10,22,40,0.85));">🖼️</div>
+      <div class="pc-body"><div class="pc-type">Social Media Design</div><h3 class="pc-title">Monthly Social Pack — Restaurant</h3><p class="pc-desc">30 social media posts per month with consistent branding, promotions, and seasonal content.</p><div class="pc-tags"><span class="pc-tag">Canva</span><span class="pc-tag">Social Media</span><span class="pc-tag">Design</span></div></div>
+    </div>
+    <div class="portfolio-card reveal" data-cat="web">
+      <div class="pc-thumb" style="background:linear-gradient(135deg,rgba(201,168,76,0.1),rgba(17,34,64,0.9));">🐧</div>
+      <div class="pc-body"><div class="pc-type">Linux & Hosting</div><h3 class="pc-title">Linux Server Migration</h3><p class="pc-desc">Complete server migration from Windows to Ubuntu, with ERPNext, SSL, Nginx, and security hardening.</p><div class="pc-tags"><span class="pc-tag">Ubuntu</span><span class="pc-tag">Nginx</span><span class="pc-tag">ERPNext</span><span class="pc-tag">SSL</span></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+<div class="cta-section">
+  <h2 class="reveal">Want to be our <span>Next Success Story?</span></h2>
+  <p class="reveal">Let's discuss your project and create something amazing together.</p>
+  <a href="contact.html" class="btn-primary reveal">🚀 Start a Project</a>
+</div>
+
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand"><a href="index.html" class="nav-logo" style="font-size:1.5rem;">Nexavo<span>.</span></a><p>Premium software house delivering cutting-edge digital solutions.</p></div>
+    <div class="footer-col"><h4>Services</h4><ul><li><a href="services.html">Web Development</a></li><li><a href="services.html">ERPNext</a></li><li><a href="services.html">App Development</a></li></ul></div>
+    <div class="footer-col"><h4>Company</h4><ul><li><a href="about.html">About</a></li><li><a href="team.html">Team</a></li><li><a href="portfolio.html">Portfolio</a></li></ul></div>
+    <div class="footer-col"><h4>Contact</h4><ul><li><a href="mailto:info@nexavo.com">info@nexavo.com</a></li><li><a href="contact.html">Get a Quote</a></li></ul></div>
+  </div>
+  <div class="footer-bottom"><p>© 2026 Nexavo Software House. All rights reserved.</p><p style="color:var(--gold);font-family:'Space Mono',monospace;font-size:0.72rem;letter-spacing:2px;">PREMIUM DIGITAL SOLUTIONS</p></div>
+</footer>
+<script src="main.js"></script>
+<script>
+function filterPortfolio(cat, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.portfolio-card').forEach(card => {
+    if (cat === 'all' || card.dataset.cat === cat) {
+      card.style.display = 'block';
+      card.style.animation = 'fadeUp 0.4s ease forwards';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+</script>
+</body>
+</html>
