@@ -50,6 +50,70 @@
     }
     .admin-toggle:hover { transform: scale(1.05); background: #e0c87a; }
     
+    /* Password Modal */
+    .password-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .password-modal.show {
+      display: flex;
+    }
+    .password-box {
+      background: #0F1F2E;
+      border: 2px solid var(--gold);
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 0 50px rgba(201,168,76,0.3);
+    }
+    .password-box h3 {
+      color: var(--gold);
+      margin-bottom: 20px;
+      font-family: 'Playfair Display', serif;
+    }
+    .password-box input {
+      width: 100%;
+      padding: 12px;
+      background: #0A1628;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: white;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+    .password-box input:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+    .password-box button {
+      background: var(--gold);
+      border: none;
+      padding: 10px 30px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: bold;
+      margin: 5px;
+    }
+    .password-box button:hover {
+      background: #e0c87a;
+    }
+    .password-error {
+      color: #f87171;
+      font-size: 14px;
+      margin-top: 10px;
+      display: none;
+    }
+    
     .admin-panel {
       display: none;
       background: rgba(10, 22, 40, 0.97);
@@ -105,6 +169,17 @@
       font-size: 24px;
       cursor: pointer;
     }
+    .empty-state {
+      text-align: center;
+      padding: 60px;
+      background: rgba(15,31,46,0.5);
+      border-radius: 20px;
+      border: 1px dashed var(--border);
+    }
+    .empty-state p {
+      color: #888;
+      margin-bottom: 15px;
+    }
   </style>
 </head>
 <body>
@@ -133,9 +208,22 @@
   </div>
 </div>
 
+<!-- Password Modal -->
+<div class="password-modal" id="passwordModal">
+  <div class="password-box">
+    <h3>🔐 Admin Access</h3>
+    <input type="password" id="adminPassword" placeholder="Enter password" autocomplete="off">
+    <div>
+      <button onclick="verifyPassword()">Submit</button>
+      <button onclick="closePasswordModal()">Cancel</button>
+    </div>
+    <div class="password-error" id="passwordError">❌ Wrong password! Try again.</div>
+  </div>
+</div>
+
 <!-- Hidden Admin Panel -->
 <div class="admin-panel" id="adminPanel">
-  <button class="close-panel-btn" onclick="toggleAdminPanel()">✕</button>
+  <button class="close-panel-btn" onclick="closeAdminPanel()">✕</button>
   <h3 style="color:var(--gold); margin-bottom: 20px;">⚡ Portfolio Manager</h3>
   <div id="adminSuccessMsg" class="success-msg"></div>
   <div class="form-row">
@@ -160,7 +248,7 @@
   </div>
 </div>
 
-<button class="admin-toggle" onclick="toggleAdminPanel()">🔐 Admin Panel</button>
+<button class="admin-toggle" onclick="showPasswordModal()">🔐 Admin Panel</button>
 
 <section>
   <div class="portfolio-filters reveal">
@@ -193,7 +281,12 @@
 
 <script src="main.js"></script>
 <script>
+  // ========== PASSWORD CONFIGURATION ==========
+  const ADMIN_PASSWORD = "nexavo2024";
+  // ============================================
+  
   const STORAGE_KEY = 'nexavo_portfolio_projects';
+  let isAdminLoggedIn = false;
   
   const DEFAULT_PROJECTS = [
     { title: "Corporate Website — TechCorp", category: "web", desc: "Full corporate website with CMS, SEO, multi-language.", tags: ["HTML","CSS","JS","PHP"], emoji: "🌐" },
@@ -203,29 +296,44 @@
     { title: "Inventory Manager App", category: "app", desc: "Cross-platform inventory management app.", tags: ["React","Node.js"], emoji: "📱" }
   ];
 
+  // FIXED: Get projects - allows empty array (no auto-reset)
   function getProjects() {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored && JSON.parse(stored).length > 0) return JSON.parse(stored);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_PROJECTS));
-    return [...DEFAULT_PROJECTS];
+    
+    // If nothing in localStorage yet, initialize with defaults
+    if (stored === null) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_PROJECTS));
+      return [...DEFAULT_PROJECTS];
+    }
+    
+    // Return whatever is in localStorage (even if empty array)
+    return JSON.parse(stored);
   }
 
   function saveProjects(projects) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
     renderPortfolioGrid();
-    renderProjectsList();
+    if (isAdminLoggedIn) renderProjectsList();
   }
 
   function renderPortfolioGrid() {
     const projects = getProjects();
     const grid = document.getElementById('portfolio-grid');
     if (!grid) return;
+    
     if (projects.length === 0) {
-      grid.innerHTML = '<div style="text-align:center; padding:60px; color:#888;">No projects yet. Click Admin Panel to add! 🚀</div>';
+      grid.innerHTML = `
+        <div class="empty-state">
+          <p>✨ No projects yet.</p>
+          <p style="font-size: 14px;">Click the <strong style="color:var(--gold);">🔐 Admin Panel</strong> button to add your first project!</p>
+        </div>
+      `;
       return;
     }
+    
     const catNames = {'web':'Web Development','erp':'ERP','design':'Design','ecommerce':'E-Commerce','app':'App Development'};
     function escape(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+    
     grid.innerHTML = projects.map(proj => `
       <div class="portfolio-card" data-cat="${proj.category}">
         <div class="pc-thumb" style="font-size:3.8rem;">${proj.emoji || '📁'}</div>
@@ -244,10 +352,12 @@
     const container = document.getElementById('projectsList');
     if (!container) return;
     function escape(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+    
     if (projects.length === 0) {
-      container.innerHTML = '<p style="color:#888;">No projects yet. Add one above!</p>';
+      container.innerHTML = '<p style="text-align:center; color:#888; padding:20px;">No projects yet. Add your first project above! 🚀</p>';
       return;
     }
+    
     container.innerHTML = projects.map((proj, idx) => `
       <div class="project-item">
         <div style="display:flex; align-items:center; gap:12px;">
@@ -272,30 +382,66 @@
     const desc = document.getElementById('description').value.trim();
     const tagsInput = document.getElementById('tags').value.trim();
     const emoji = document.getElementById('emoji').value.trim() || '🚀';
-    if (!title || !desc) { showAdminMessage('❌ Fill title and description', true); return; }
+    
+    if (!title || !desc) { 
+      showAdminMessage('❌ Please fill in both Title and Description', true); 
+      return; 
+    }
+    
     const tags = tagsInput ? tagsInput.split(',').map(t => t.trim()) : [];
     const projects = getProjects();
     projects.push({ title, category, desc, tags, emoji });
     saveProjects(projects);
+    
+    // Clear form
     document.getElementById('title').value = '';
     document.getElementById('description').value = '';
     document.getElementById('tags').value = '';
-    showAdminMessage('✅ Project added!');
+    document.getElementById('emoji').value = '🚀';
+    
+    showAdminMessage('✅ Project added successfully!');
   }
 
   function resetToDefault() {
-    if (confirm('Reset all projects to defaults?')) {
+    if (confirm('⚠️ This will delete ALL your current projects and restore the default ones. Are you sure?')) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_PROJECTS));
       renderPortfolioGrid();
-      renderProjectsList();
-      showAdminMessage('✅ Reset to defaults!');
+      if (isAdminLoggedIn) renderProjectsList();
+      showAdminMessage('✅ Reset to default projects!');
     }
   }
 
-  function toggleAdminPanel() {
+  // Password functions
+  function showPasswordModal() {
+    document.getElementById('passwordModal').classList.add('show');
+    document.getElementById('adminPassword').value = '';
+    document.getElementById('passwordError').style.display = 'none';
+  }
+  
+  function closePasswordModal() {
+    document.getElementById('passwordModal').classList.remove('show');
+  }
+  
+  function verifyPassword() {
+    const password = document.getElementById('adminPassword').value;
+    if (password === ADMIN_PASSWORD) {
+      isAdminLoggedIn = true;
+      closePasswordModal();
+      showAdminPanel();
+    } else {
+      document.getElementById('passwordError').style.display = 'block';
+    }
+  }
+  
+  function showAdminPanel() {
     const panel = document.getElementById('adminPanel');
-    panel.classList.toggle('show');
-    if (panel.classList.contains('show')) renderProjectsList();
+    panel.classList.add('show');
+    renderProjectsList();
+  }
+  
+  function closeAdminPanel() {
+    document.getElementById('adminPanel').classList.remove('show');
+    isAdminLoggedIn = false;
   }
 
   function showAdminMessage(msg, isError = false) {
@@ -304,7 +450,10 @@
     msgDiv.style.display = 'block';
     msgDiv.style.background = isError ? 'rgba(200,50,50,0.2)' : 'rgba(76,175,80,0.2)';
     msgDiv.style.borderColor = isError ? '#f44336' : '#4caf50';
-    setTimeout(() => msgDiv.style.display = 'none', 3000);
+    msgDiv.style.color = isError ? '#f87171' : '#4caf50';
+    setTimeout(() => {
+      msgDiv.style.display = 'none';
+    }, 3000);
   }
 
   function filterPortfolio(cat, btn) {
@@ -314,7 +463,13 @@
       card.style.display = (cat === 'all' || card.dataset.cat === cat) ? 'block' : 'none';
     });
   }
+  
+  // Enter key submit for password
+  document.getElementById('adminPassword')?.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') verifyPassword();
+  });
 
+  // Initialize
   renderPortfolioGrid();
 </script>
 </body>
