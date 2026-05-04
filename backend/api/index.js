@@ -2,18 +2,62 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 
-// Enable CORS for all origins
-app.use(cors());
+// Enable CORS for Netlify
+app.use(cors({
+  origin: ['https://nexavoagency.netlify.app', 'http://localhost:3000'],
+  credentials: true
+}));
+
 app.use(express.json());
+
+// In-memory storage
+let projects = [
+  {
+    id: 1,
+    title: "ERPNext Demo",
+    description: "Sample ERPNext project",
+    category: "ERPNext",
+    image_url: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=400",
+    live_url: "#"
+  }
+];
+let enquiries = [];
 
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Backend is working!' });
 });
 
-// Get projects
+// Get projects (with category filter)
 app.get('/api/projects', (req, res) => {
-  res.json({ success: true, projects: [] });
+  const { category } = req.query;
+  let filtered = projects;
+  if (category && category !== 'all') {
+    filtered = projects.filter(p => p.category === category);
+  }
+  res.json({ success: true, projects: filtered });
+});
+
+// Add new project
+app.post('/api/projects', (req, res) => {
+  const { title, description, category, image_url, live_url } = req.body;
+  const newProject = {
+    id: Date.now(),
+    title,
+    description,
+    category,
+    image_url: image_url || "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=400",
+    live_url: live_url || "#",
+    created_at: new Date().toISOString()
+  };
+  projects.push(newProject);
+  res.json({ success: true, project: newProject });
+});
+
+// Delete project
+app.delete('/api/projects/:id', (req, res) => {
+  projects = projects.filter(p => p.id != req.params.id);
+  res.json({ success: true });
 });
 
 // Login route
@@ -34,8 +78,20 @@ app.post('/api/auth/login', (req, res) => {
 
 // Contact form
 app.post('/api/enquiries', (req, res) => {
-  console.log('Enquiry:', req.body);
+  const enquiry = { id: Date.now(), ...req.body, timestamp: new Date().toISOString() };
+  enquiries.push(enquiry);
+  console.log('Enquiry:', enquiry);
   res.json({ success: true, message: 'Thank you! We will contact you soon.' });
+});
+
+// Get enquiries (admin only - simple check)
+app.get('/api/enquiries', (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (token === 'hardcoded-token-2024') {
+    res.json({ success: true, enquiries });
+  } else {
+    res.status(401).json({ error: 'Unauthorized' });
+  }
 });
 
 module.exports = app;
