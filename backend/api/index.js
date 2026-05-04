@@ -2,53 +2,32 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 
-// ✅ CORS Fix for Netlify
-app.use(cors({
-  origin: 'https://nexavoagency.netlify.app',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-}));
-
-app.options('*', cors());
+app.use(cors());
 app.use(express.json());
 
-// ✅ Root route
 app.get('/', (req, res) => {
-  res.json({ message: 'Nexavo Backend is running!', status: 'active' });
+  res.json({ message: 'Nexavo Backend is running!' });
 });
 
-// ✅ Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Backend is working!' });
+  res.json({ status: 'OK' });
 });
 
-// ✅ Get projects
 app.get('/api/projects', (req, res) => {
   res.json({ success: true, projects: [] });
 });
 
-// ✅ Login route
 app.post('/api/auth/login', (req, res) => {
   const { username, password } = req.body;
-  console.log('Login attempt:', username);
-
   if (username === 'nexavo' && password === 'Nexavo2024') {
-    res.json({
-      success: true,
-      token: 'hardcoded-token-2024',
-      admin: { username: 'nexavo' }
-    });
+    res.json({ success: true, token: 'dummy-token', admin: { username } });
   } else {
     res.status(401).json({ error: 'Invalid credentials' });
   }
 });
 
-// ✅ Contact form
 app.post('/api/enquiries', (req, res) => {
-  console.log('Enquiry:', req.body);
-  res.json({ success: true, message: 'Thank you! We will contact you soon.' });
+  res.json({ success: true, message: 'Thank you!' });
 });
 
-// ✅ Vercel ke liye export (app.listen nahi chahiye)
 module.exports = app;
