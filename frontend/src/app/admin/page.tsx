@@ -2,9 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
-
-const API_URL = "https://nexavo-backend.vercel.app";
 
 export default function AdminLogin() {
   const [username, setUsername] = useState("");
@@ -13,27 +10,21 @@ export default function AdminLogin() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
-    try {
-      const response = await axios.post(`${API_URL}/api/auth/login`, {
-        username,
-        password,
-      });
-
-      if (response.data.success) {
-        localStorage.setItem("adminToken", response.data.token);
-        localStorage.setItem("adminInfo", JSON.stringify(response.data.admin));
-        router.push("/admin/dashboard");
-      }
-    } catch (err: any) {
-      setError(err.response?.data?.error || "Login failed");
-    } finally {
-      setLoading(false);
+    // Hardcoded credentials
+    if (username === "nexavo" && password === "Nexavo@2024") {
+      localStorage.setItem("adminToken", "hardcoded-token-123");
+      localStorage.setItem("adminInfo", JSON.stringify({ id: 1, username: "nexavo" }));
+      router.push("/admin/dashboard");
+    } else {
+      setError("Invalid username or password");
     }
+
+    setLoading(false);
   };
 
   return (
@@ -41,9 +32,7 @@ export default function AdminLogin() {
       <div className="glass-card p-8 max-w-md w-full">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold gradient-text mb-2">Admin Login</h1>
-          <p className="text-gray-400">
-            Enter your credentials to access dashboard
-          </p>
+          <p className="text-gray-400">Enter your credentials to access dashboard</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -85,6 +74,12 @@ export default function AdminLogin() {
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
+
+        <div className="mt-6 text-center text-sm text-gray-400">
+          <p>Default credentials:</p>
+          <p>Username: <strong>nexavo</strong></p>
+          <p>Password: <strong>Nexavo@2024</strong></p>
+        </div>
       </div>
     </div>
   );
