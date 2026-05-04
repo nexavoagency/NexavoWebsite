@@ -2,13 +2,19 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 
-// Enable CORS for Netlify
-app.use(cors({
-  origin: ['https://nexavoagency.netlify.app', 'http://localhost:3000'],
+// CORS - Allow Netlify frontend
+const corsOptions = {
+  origin: 'https://nexavoagency.netlify.app',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
-}));
+};
 
+app.use(cors(corsOptions));
 app.use(express.json());
+
+// Handle preflight requests
+app.options('*', cors(corsOptions));
 
 // In-memory storage
 let projects = [
@@ -84,7 +90,7 @@ app.post('/api/enquiries', (req, res) => {
   res.json({ success: true, message: 'Thank you! We will contact you soon.' });
 });
 
-// Get enquiries (admin only - simple check)
+// Get enquiries (admin only)
 app.get('/api/enquiries', (req, res) => {
   const token = req.headers.authorization?.split(' ')[1];
   if (token === 'hardcoded-token-2024') {
