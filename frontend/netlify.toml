@@ -1,0 +1,9 @@
+[build]
+  command = "npm install && npm run build"
+  publish = "out"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[context.production.environment]
+  NEXT_PUBLIC_API_URL = "https://nexavo-backend.vercel.app"
