@@ -4,7 +4,15 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
 const app = express();
-app.use(cors());
+
+// CORS configuration
+app.use(cors({
+  origin: ['https://nexavoagency.netlify.app', 'http://localhost:3000'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
 let projects = [];
@@ -25,18 +33,32 @@ const auth = (req, res, next) => {
 };
 
 // Routes
-app.get('/api/health', (req, res) => res.json({ status: 'OK' }));
-app.get('/api/projects', (req, res) => res.json({ success: true, projects }));
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'OK', message: 'Backend is running!' });
+});
+
+app.get('/api/projects', (req, res) => {
+  res.json({ success: true, projects });
+});
+
 app.post('/api/enquiries', (req, res) => {
-  enquiries.push({ id: Date.now(), ...req.body, timestamp: new Date() });
-  res.json({ success: true, message: 'Thank you!' });
+  const enquiry = { id: Date.now(), ...req.body, timestamp: new Date() };
+  enquiries.push(enquiry);
+  res.json({ success: true, message: 'Thank you! We will contact you soon.' });
 });
 
 app.post('/api/auth/login', (req, res) => {
   const { username, password } = req.body;
-  if (username !== ADMIN_USER || !bcrypt.compareSync(password, ADMIN_PASS)) {
+  console.log('Login attempt:', username);
+  
+  if (username !== ADMIN_USER) {
     return res.status(401).json({ error: 'Invalid credentials' });
   }
+  
+  if (!bcrypt.compareSync(password, ADMIN_PASS)) {
+    return res.status(401).json({ error: 'Invalid credentials' });
+  }
+  
   const token = jwt.sign({ username }, 'secret_key', { expiresIn: '7d' });
   res.json({ success: true, token, admin: { username } });
 });
@@ -52,6 +74,16 @@ app.delete('/api/projects/:id', auth, (req, res) => {
   res.json({ success: true });
 });
 
-projects.push({ id: 1, title: "ERPNext Demo", description: "Sample", category: "ERPNext", image_url: "https://via.placeholder.com/400", live_url: "#" });
+app.options('*', cors());
+
+// Add sample data
+projects.push({ 
+  id: 1, 
+  title: "ERPNext Demo", 
+  description: "Sample ERP project", 
+  category: "ERPNext", 
+  image_url: "https://via.placeholder.com/400", 
+  live_url: "#" 
+});
 
 module.exports = app;
