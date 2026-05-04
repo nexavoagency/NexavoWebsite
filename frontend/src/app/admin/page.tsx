@@ -1,22 +1,22 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import axios from 'axios';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 
-const API_URL = 'https://nexavo-backend.vercel.app';
+const API_URL = "https://nexavo-backend.vercel.app";
 
 export default function AdminLogin() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
       const response = await axios.post(`${API_URL}/api/auth/login`, {
@@ -25,12 +25,12 @@ export default function AdminLogin() {
       });
 
       if (response.data.success) {
-        localStorage.setItem('adminToken', response.data.token);
-        localStorage.setItem('adminInfo', JSON.stringify(response.data.admin));
-        router.push('/admin/dashboard');
+        localStorage.setItem("adminToken", response.data.token);
+        localStorage.setItem("adminInfo", JSON.stringify(response.data.admin));
+        router.push("/admin/dashboard");
       }
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Login failed');
+      setError(err.response?.data?.error || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -41,7 +41,9 @@ export default function AdminLogin() {
       <div className="glass-card p-8 max-w-md w-full">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold gradient-text mb-2">Admin Login</h1>
-          <p className="text-gray-400">Enter your credentials to access dashboard</p>
+          <p className="text-gray-400">
+            Enter your credentials to access dashboard
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -80,7 +82,7 @@ export default function AdminLogin() {
             disabled={loading}
             className="btn-primary w-full disabled:opacity-50"
           >
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
       </div>
